@@ -47,4 +47,55 @@ describe('UsersController', () => {
       });
     });
   });
+
+  describe('findAll()', () => {
+    it('should return all users', () => {
+      const user: User = {
+        id: 1,
+        name: 'Joe',
+      };
+
+      jest.spyOn(service, 'findAll').mockImplementation(async () => {
+        return [user];
+      });
+
+      expect(controller.findAll()).resolves.toEqual([user]);
+    });
+
+    it('should return an empty array', () => {
+      const user: User[] = [];
+
+      jest.spyOn(service, 'findAll').mockImplementation(async () => {
+        return user;
+      });
+
+      expect(controller.findAll()).resolves.toEqual(user);
+    });
+  });
+
+  describe('findOne()', () => {
+    it('should return a user', () => {
+      const user: User = {
+        id: 1,
+        name: 'Joe',
+      };
+      jest.spyOn(service, 'findOne').mockImplementation(async () => {
+        return user;
+      });
+
+      expect(controller.findOne(1)).resolves.toEqual(user);
+    });
+
+    it('should return not found exeption', () => {
+      jest.spyOn(service, 'findOne').mockRejectedValueOnce({
+        statusCode: 404,
+        message: 'Not found',
+      });
+
+      expect(controller.findOne(2)).rejects.toEqual({
+        statusCode: 404,
+        message: 'Not found',
+      });
+    });
+  });
 });

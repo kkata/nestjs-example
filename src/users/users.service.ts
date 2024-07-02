@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,5 +20,26 @@ export class UsersService {
         `Failed to create user: ${e.message}`,
       );
     });
+  }
+
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find().catch((e) => {
+      throw new InternalServerErrorException(
+        `Failed to find users: ${e.message}`,
+      );
+    });
+  }
+
+  async findOne(id: number): Promise<User> {
+    return await this.userRepository
+      .findOne({
+        where: { id },
+      })
+      .then((res) => {
+        if (!res) {
+          throw new NotFoundException();
+        }
+        return res;
+      });
   }
 }
